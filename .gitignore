@@ -1,3 +1,17 @@
 node_modules
+# Logs
+logs
 *.log
-*.key
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# IDE
+.idea
+
+# Idea
+.idea
+17-04-2019/config/*
