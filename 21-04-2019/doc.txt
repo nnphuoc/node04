@@ -1,0 +1,12 @@
+1, Mô hình web client - server
+    - web app - server return data
+    - web view - server return html view + data 
+API application programing interface
+----------------
+2, Express js là 1 framework của Nodejs 
+- Advanteages: 
+    + Stability (ổn định)
+    + Community (cộng đồng)
+    + Understandable (dễ hiểu)
+Một số framework liên quan: Hapijs, Koa, Adonis (cấu hình giống laravel), totaljs (bên IOT), ... Nestjs (mới)
+Các framework sau này đều dùng nhân từ Expressjs

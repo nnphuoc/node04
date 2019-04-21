@@ -1,0 +1,12 @@
+1. Kiểu dữ liệu:
+    Kiểu tham chiếu và kiểu con trỏ
+    const result = Object.assign(target, resorce) resorce sẽ ovewrite target. từ target sẽ trả data về cho result{ a: 1, b: 4, c: 5 }
+2. Các vòng loop
+    ES5 arr.indexOf(param) -1 not fount/ index of param in arr => ES6 arr.includes() true/false
+3. Condion
+    switch(true) {
+        case (Condion): 
+            break;
+    }
+4. Function
+    

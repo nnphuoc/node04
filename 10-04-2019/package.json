@@ -1,0 +1,21 @@
+{
+  "name": "10-04-2019",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index"
+  },
+  "keywords": [
+    "phuoc.nn"
+  ],
+  "author": "phuocnn",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^3.0.5"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.11"
+  }
+}

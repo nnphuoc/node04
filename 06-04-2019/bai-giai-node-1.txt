@@ -1,0 +1,105 @@
+
+const users = [
+    { id: 1, name: 'User 1' }, { id: 2, name: 'User 2' }
+];
+
+
+const products = [
+    { id: 1, userId: 1, name: 'Product 1' }, { id: 2, userId: 2, name: 'Product 2' }, { id: 3, userId: 2, name: 'Product 3' }, { id: 4, userId: 1, name: 'Product 4' }
+];
+// ------------------Bai tap 1
+
+//1
+// function getListProductUser1() {
+//   const cloneProducts = [...products];
+//   for (const product of cloneProducts) {
+//     product.user = null;
+//     for (const user of users) {
+//       if (user.id === product.userId) {
+//         product.user = user;
+//         break;
+//       }
+//     }
+//   }
+//   return cloneProducts;
+// }
+
+// console.log(getListProductUser());
+
+
+//2
+// function getListProductUser2() {
+//   const cloningProducts = [...products];
+//   const returningProducts = cloningProducts.map(function(product) {
+//     const cloneItem = { ...product };
+//     cloneItem.user = users.find(function(user) {
+//       return user.id === product.userId;
+//     });
+//     return cloneItem;
+//   });
+//   return returningProducts;
+// }
+
+// console.log(getListProductUser2());
+
+//3
+function getListProductUser3() {
+    const copyProducts = [...products]; // copy products
+    const copyUsers = [...users]; // copy users
+    let storedUsers = {}; // Init dictionary
+    const returningProducts = copyProducts.map(function(product) {
+        let copyProduct = { ...product }; // copy product
+        if (!storedUsers[copyProduct.userId]) { // Check if user existed in dictionary
+            copyProduct.user = copyUsers.find(function(user, index) {
+                if (user.id === product.userId) {
+                    storedUsers[user.id] = user; // Save user to dictionary
+                    copyUsers.splice(index, 1); //Remove element in users
+                    return user.id === product.userId;
+                }
+            });
+        } else { // If user is existed in dictionary
+            copyProduct.user = storedUsers[copyProduct.userId];
+        }
+        return copyProduct;
+    });
+    return returningProducts;
+}
+
+console.log(getListProductUser3())
+
+
+//-------------Bai tap 2
+
+function getListUserProduct1() {
+    const copyUsers = [...users];
+    const copyProducts = [...products];
+
+    for (const user of copyUsers) {
+        user.products = copyProducts.filter((item, index) => {
+            if (item.userId === user.id) {
+                copyProducts.splice(index, 1);
+                return true;
+            };
+        });
+    }
+    return copyUsers;
+}
+
+
+// console.log(JSON.stringify(getListUserProduct1(), null, 2));
+
+function getListUserProduct2() {
+    let stock = {};
+    for (const product of products) {
+        if (!stock[product.userId]) {
+            stock[product.userId] = [];
+        }
+        stock[product.userId].push(product);
+    }
+
+    for(const user of users) {
+        user.products = stock[user.id];
+    }
+    return users;
+}
+// console.log(JSON.stringify(getListUserProduct2(), null, 2))

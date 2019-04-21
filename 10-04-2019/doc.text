@@ -1,0 +1,19 @@
+1, tham số kèm theo của npm install:
+    1, '--save' lưu thư viện vào file package.json
+    2, cách đặt tên cho vertion "a.b.c": với c sẽ là số bug fix nhẹ, b là số bug nặng, 
+        a là đã được relive
+2, call back 
+    1, xảy ra khi đụng đến ổ cứng I/O, tác vụ nặng.
+    ***cluster and fork ubuntu***
+    4 core --> chạy fork sẽ chạy 1 corse.
+                chạy cluster tùy theo tham số truyền vào `cluster -i 1,2,3,4` nên sẽ dễ bị 
+                    conflic giữa 4 core
+    cách giải quyết: 
+        dùng ram lock sesstionId. redis: xét phiên làm việc -> nhanh, nhược điểm: nếu redis chết thì mất hết phiên
+        dùng db để lobk db lại. lock sesstion dưới db -> chậm
+
+bt: sử dụng readFile and writeFile
+    làm lại bt1 để tối ưu hơn
+
+*** Write stream sử dụng trong web film sẽ trả về từng đoạn 1
+    Write file disconect sẽ chạy lại từ đầu
