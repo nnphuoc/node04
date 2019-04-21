@@ -9,4 +9,10 @@ API application programing interface
     + Community (cộng đồng)
     + Understandable (dễ hiểu)
 Một số framework liên quan: Hapijs, Koa, Adonis (cấu hình giống laravel), totaljs (bên IOT), ... Nestjs (mới)
-Các framework sau này đều dùng nhân từ Expressjs
+Hầu hêt các framework sau này đều dùng nhân từ Expressjs
+Một số framework k dùng Expressjs làm nhân 
+
+- Disadavantages (nhực điểm)
+ + Weak security (bảo mật k cao)
+ + Warting time 
+ + Performance - benchmark (so sánh công nghệ )
