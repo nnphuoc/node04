@@ -22,7 +22,25 @@ export default class MiddlewareUser {
         try {
             const _id =req.params.id;
             if (_id.length !== 24 || !ObjectID.isValid(_id)) {
-                return next(new Error(`INVALID_OBJECT_ID`));
+                return res.json({
+                    code: 'ID_NOT_MATCH',
+                    message: 'Sorry, this id not match'
+                });
+            }
+            return next();
+        } catch (e) {
+            return next(e);
+        }
+    }
+
+    static async isEmptyPass (req, res, next) {
+        try {
+            const password =req.body.password;
+            if (!req.body.password) {
+                return res.json({
+                    code: 'MISSING_PRAMS',
+                    message: 'Sorry, this missing password'
+                });
             }
             return next();
         } catch (e) {

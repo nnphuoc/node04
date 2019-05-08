@@ -9,7 +9,7 @@ export default class ControllerUser {
         try {
             const body =req.body;
             const userDB = req.db.collection('user');
-            const count = await userDB.countDocuments({ username: body.username});
+            const count = await userDB.countDocuments({ username: body.username });
             if (count !== 0) {
                 return res.json({
                     code: 'USER_IS_USED',
