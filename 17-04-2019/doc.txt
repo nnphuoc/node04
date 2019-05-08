@@ -1,3 +1,0 @@
-1,  Nếu dùng .then .catch thì không dùng await, 
-    nếu hàm đc định nghĩa async thì vẫn dùng đx .then .catch
-2,  json web token
