@@ -25,7 +25,7 @@ module.exports = (app, router) => {
     router
         .route('/user/:id')
         .get([isObjectID], ControllerUser.getOne)
-        .put([isObjectID, validateUserUpdate], ControllerUser.update)
+        .put([isObjectID, validateUserUpdate, errors()], ControllerUser.update)
         .delete([isObjectID], ControllerUser.delete);
 
 };

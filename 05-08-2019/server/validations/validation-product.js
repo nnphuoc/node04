@@ -1,13 +1,5 @@
 import Joi from '@hapi/joi';
 
-const checkName = () => {
-    return { 
-        params: {
-            name: Joi.string().max(20).required()
-        }
-    };
-}
-
 const schemaCreateProduct = () => {
     return { 
         body: Joi.object({
