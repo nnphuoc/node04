@@ -17,6 +17,10 @@ module.exports = (app, router) => {
         .post([validateProductCreate, errors()], ControllerProduct.create);
 
     router
+        .route('/product/user/:id')
+        .get([isObjectID], ControllerProduct.getAllByUser)
+    
+    router
         .route('/product/:id')
         .get([isObjectID], ControllerProduct.getOne)
         .put([isObjectID, validateProductUpdate, errors()], ControllerProduct.update)

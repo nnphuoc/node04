@@ -50,6 +50,22 @@ export default class ControllerUser {
         }
     }
 
+    static async getAllByUser (req, res, next) {
+        try {
+            const userId = new objectId(req.params.id);
+            console.log(userId);
+            const productDB = req.db.collection('product');
+            const results = await productDB.find({ userId }).toArray();
+            return res.json({
+                message: 'success',
+                result: results
+            });
+        } catch (e) {
+            return next(e);
+        }
+    }
+
+
     static async getOne (req, res, next) {
         try {
             const _id = new objectId(req.params.id);
