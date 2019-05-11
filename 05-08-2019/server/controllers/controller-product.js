@@ -41,7 +41,6 @@ export default class ControllerUser {
                 }
                 result.users = objUser[result.userId];
             }
-            console.log(results);
             return res.json({
                 message: 'success',
                 result: results
