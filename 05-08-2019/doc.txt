@@ -1,0 +1,14 @@
+4. CRUD products 
+{
+    _id: Object(id),
+    name: String,
+    userId: Object(id) from user,
+    price: number,
+    colors: String array ['red', 'yellow'],
+    isAvailable: boolean,
+    payload: {
+        releasedAt: Date,
+        expriredAt: Date 
+    }
+    
+}
