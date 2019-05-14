@@ -7,10 +7,11 @@ const objectId = mongodb.ObjectID;
 export default class ControllerUser {
     static async create (req, res, next) {
         try {
-            let body =req.body;
+            let body = req.body;
             body.userId = new objectId(body.userId);
             const productDB = req.db.collection('product');
             const result = await productDB.insertOne(body);
+            
             return res.status(201).json({
                 message: 'success',
                 result: result.ops[0]

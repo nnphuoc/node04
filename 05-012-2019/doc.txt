@@ -1,0 +1,14 @@
+Mongodb: 
+ưu điểm
+    1. Nhanh : get nhanh >< write chậm 
+        -> microservices: sử lý write and get ở 2 service khác nhau 
+    2. Dễ config. 
+nhược điểm 
+    1. no sercurity 
+    2. code nhiều 
+    3. non sql 
+-----------
+MVC 
+
+Resoisitory pattern 
+Factory pattern
