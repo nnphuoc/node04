@@ -14,8 +14,6 @@ var schema = new Schema(
         },
         password: {
             type: String,
-            maxlength: 20,
-            minlength: 6,
             required: true
         },
         name: {

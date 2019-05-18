@@ -7,8 +7,8 @@ export default class ControllerUser {
     static async create (req, res, next) {
         try {
             let body = req.body;
-            const count = await User.countDocuments({ _id: body.user });
-            if (count === 0) {
+            const user = await User.findOne({ where: { _id: body.user }});
+            if (!user) {
                 return res.status(400).json({
                     message: 'Sorry, user not found',
                     code: 'USER_NOT_FOUND'
@@ -28,7 +28,6 @@ export default class ControllerUser {
     static async getAll (req, res, next) {
         try {
             const products = await Product.getAll({
-                where: {},
                 populate: [{
                     path: 'user',
                     select: '_id name username'

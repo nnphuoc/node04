@@ -1,7 +1,8 @@
 'use strict';
 
-import MiddlewareUser from './middlewares-user';
-
+import MiddlewareUser from './user';
+import Auth from './authentication';
 module.exports = {
-    MiddlewareUser
+    MiddlewareUser,
+    Auth
 };
