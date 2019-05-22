@@ -112,7 +112,8 @@ export default class ControllerUser {
                 where: {
                     code: code,
                     user: user._id
-                }
+                },
+                isLean: false
             });
             if (!verify) {
                 return next(new Error('VERIFY_CODE_NOT_FOUND'));
@@ -121,6 +122,7 @@ export default class ControllerUser {
                 return next(new Error('VERIFY_CODE_EXPIRED'));
             }
             const token = await jwtHelper.sign({ _id: user._id });
+            await verify.remove();
             return res.json({
                 message: 'success',
                 result: {
