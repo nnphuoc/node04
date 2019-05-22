@@ -1,15 +1,23 @@
 import jwt from 'jsonwebtoken';
-
+import path from 'path';
+import fs from 'fs';
+const privateKey = fs.readFileSync(path.resolve(__dirname, '../config/cert/private.key'), 'utf8');
+const publicKey = fs.readFileSync(path.resolve(__dirname, '../config/cert/public.key'), 'utf8');
 export default class JWTHelper {
   
-  static async sign(uid) {
-    return jwt.sign({ uid }, process.env.JWT_SECRET, {
-      expiresIn: 60 * 60 * 24 * 30
-    });
+  static async sign(uid, options) {
+    options = Object.assign(
+      {
+        algorithm: 'RS256', 
+        expiresIn: 60*60*60
+      },
+      options
+    );
+    return jwt.sign({ uid }, privateKey, options);
   }
 
-  static async verifyToken(token) {
-    return jwt.verify(token, process.env.JWT_SECRET);
+  static async verifyToken(token, options = {}) {
+    return jwt.verify(token, publicKey, options);
   }
 
   static async getToken(req) {

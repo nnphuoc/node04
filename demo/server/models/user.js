@@ -19,6 +19,10 @@ var schema = new Schema(
         name: {
             type: String,
             maxlength: 255
+        },
+        email: {
+            type: String,
+            maxlength: 255
         }
     },
     {

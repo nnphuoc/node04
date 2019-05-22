@@ -13,7 +13,8 @@ const checkCreateUser = () => {
         body: Joi.object({
             username: Joi.string().max(20).required().label("Your error message in here"),
             password: Joi.string().min(6).max(20).required().label("Your error a in here"),
-            name: Joi.string()
+            name: Joi.string(),
+            email: Joi.string().email()
         })
     };
 }
@@ -21,7 +22,26 @@ const checkCreateUser = () => {
 const checkUpdateUser = () => {
     return { 
         body: Joi.object({
-            password: Joi.string().min(6).max(20).required().label("Your error a in here")
+            password: Joi.string().min(6).max(20).required().label("Your error a in here"),
+            email: Joi.string().email(),
+            name: Joi.string()
+        })
+    };
+}
+
+const forgotPassword = () => {
+    return { 
+        body: Joi.object({
+            username: Joi.string().max(20).required().label("Your error message in here")
+        })
+    };
+}
+
+const verifyOTP = () => {
+    return { 
+        body: Joi.object({
+            username: Joi.string().max(20).required().label("Your error message in here"),
+            code: Joi.string().length(6).required()
         })
     };
 }
@@ -29,5 +49,7 @@ const checkUpdateUser = () => {
 module.exports = {
     checkName,
     checkCreateUser,
-    checkUpdateUser
+    checkUpdateUser,
+    forgotPassword,
+    verifyOTP
 };

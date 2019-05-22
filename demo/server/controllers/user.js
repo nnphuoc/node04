@@ -1,8 +1,11 @@
 'use strict';
 
 import userDB from '../models/user';
+import verifyDB from '../models/verify';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwtHelper from '../helpers/jwt';
+import sendEmail from '../services/send-email';
+import Verify from '../models/classes/verify';
 
 export default class ControllerUser {
     static async create (req, res, next) {
@@ -15,8 +18,8 @@ export default class ControllerUser {
                     message: 'Sorry, this user is used'
                 });
             }
-            var salt = bcrypt.genSaltSync(2);
-            var hashPass = bcrypt.hashSync(body.password, salt);
+            let salt = bcrypt.genSaltSync(2);
+            let hashPass = bcrypt.hashSync(body.password, salt);
             body.password = hashPass;
             const result = await userDB.create(body);
             delete result._doc.createdAt;
@@ -34,14 +37,6 @@ export default class ControllerUser {
 
     static async getAll (req, res, next) {
         try {
-            const token = req.query.token;
-            const data = jwt.verify(token, 'key');
-            if (new Date(data.exp*1000) < new Date()) {
-                return res.json({
-                    code: 'Expressed',
-                    message: 'Sorry, expressed'
-                });
-            }
             const results = await userDB.getAll({});
             return res.json({
                 message: 'success',
@@ -91,13 +86,111 @@ export default class ControllerUser {
             if (!checkPass) {
                 return next(new Error('LOGIN_FAIL'));
             }
-            const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: 60*60*60 });
+            const token = await jwtHelper.sign({ _id: user._id });
             return res.json({
                 message: 'success',
                 result: {
                     token,
                     user: user._id
                 }
+            });
+        } catch (e) {
+            return next(e);
+        }
+    }
+
+    static async verify (req, res, next) {
+        try {
+            const { username, code } = req.body;
+            const user = await userDB.getOne({
+                where: { username }
+            });
+            if (!user) {
+                return next(new Error('USER_NOT_FOUND'));
+            }
+            const verify = await verifyDB.getOne({
+                where: {
+                    code: code,
+                    user: user._id
+                }
+            });
+            if (!verify) {
+                return next(new Error('VERIFY_CODE_NOT_FOUND'));
+            } 
+            if (verify.expiration < new Date()) {
+                return next(new Error('VERIFY_CODE_EXPIRED'));
+            }
+            const token = await jwtHelper.sign({ _id: user._id });
+            return res.json({
+                message: 'success',
+                result: {
+                    token,
+                    user: user._id
+                }
+            });
+        } catch (e) {
+            return next(e);
+        }
+    }
+
+    static async forgotPassword (req, res, next) {
+        try {
+            const username = req.body.username;
+            const user = await userDB.getOne(
+                { 
+                    where: { username },
+                    select: 'email'
+                }
+            );
+            if (!user) {
+                return next(new Error('USER_NOT_FOUND'));
+            }
+            if (!user.email) {
+                return next(new Error('EMAIL_NOT_FOUND'));
+            }
+            const code = Math.floor(100000 + Math.random() * 900000);
+            let expiration = new Date();
+            expiration = expiration.setMinutes(expiration.getMinutes() + 5);
+            let data = {
+                user: user._id,
+                code,
+                expiration
+            }
+            await verifyDB.create(data);
+            let send = await sendEmail.send(user.email, code);
+            let result = 'action false';
+            if (send === 'success') {
+                result = 'Life of code is 5 minutes'
+            }
+            return res.json({
+                message: send,
+                result
+            });
+        } catch (e) {
+            return next(e);
+        }
+    }
+
+    static async resertPassword (req, res, next) {
+        try {
+            const password = req.body.password;
+            console.log(req.user);
+            const user = await userDB.getOne({
+                where: { _id: req.user._id },
+                select: 'password',
+                isLean: false
+            });
+            if (!user) {
+                return next(new Error('USER_NOT_FOUND'));
+            }
+            let salt = bcrypt.genSaltSync(2);
+            let hashPass = bcrypt.hashSync(password, salt);
+            console.log(password, hashPass);
+            user.password = hashPass;
+            const result = await user.save();
+            return res.json({
+                message: 'success',
+                result
             });
         } catch (e) {
             return next(e);

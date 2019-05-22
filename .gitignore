@@ -1,6 +1,6 @@
 node_modules
-*/config/private-key.key
-*/config/public-key.key
+*/config/cert/private-key.key
+*/config/cert/public-key.key
 *config/*
 # Logs
 logs
