@@ -1,0 +1,19 @@
+node_modules
+*/config/cert/private-key.key
+*/config/cert/public-key.key
+*config/*
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# IDE
+.idea
+
+# Idea
+.idea

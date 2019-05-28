@@ -1,0 +1,5 @@
+{
+    "USER_NOT_FOUND": "Sorry, the user is not found",
+    "SEND_EMAIL_FAIL": "Send sms fail",
+    "ACTION_FAIL": "Action fail"
+}

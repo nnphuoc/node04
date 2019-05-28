@@ -1,0 +1,27 @@
+chatting - project
+
+1 Model:
+    User:
+        username
+        password
+        email
+        facebook
+        slug
+        name
+        geoPosition: [lat, lng]  (kinh do va vi do)
+        deletedAt
+
+    Group
+        _id
+        author: Who created the group, ref => User
+        name
+        members: Array of user All of the member in group( including the author), ref => User
+        lastMessage: ObbjectID
+        type: enum('individual', 'group')
+        createdAt: Time create
+        deletedAt
+
+    Messages:
+        author: ref => User
+        content: String
+        group: ref => group: send to which group
