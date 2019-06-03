@@ -1,38 +1,33 @@
 'use strict';
 import { ControllerGroup } from '../../controllers';
 import { MiddlewareUser, Auth } from '../../middlewares';
-// import {
-//     checkName,
-//     checkCreateUser,
-//     checkUpdateUser,
-//     forgotPassword,
-//     verifyOTP
-// } from '../../validations/validation-user';
-// import { celebrate, errors } from 'celebrate';
+import { pagination } from '../../validations/validation-pagination';
+import { celebrate, errors } from 'celebrate';
 
 const isObjectID = MiddlewareUser.checkObjectID;
-// const validateUserName = celebrate(checkName());
+const validatePagination = celebrate(pagination());
 const isAuth = Auth.isAuth;
+const inGroup = Auth.inGroup;
 
 module.exports = (app, router) => {
 
     router
         .route('/groups')
-        .get(ControllerGroup.getAll)
+        .get([isAuth, validatePagination, errors()], ControllerGroup.getAll)
         .post([isAuth], ControllerGroup.create);
 
     router
         .route('/groups/invite/:id')
-        .put([isAuth, isObjectID], ControllerGroup.invite);
+        .put([isAuth, inGroup, isObjectID], ControllerGroup.invite);
 
     router
         .route('/groups/leave/:id')
-        .put([isAuth, isObjectID], ControllerGroup.leave);
+        .put([isAuth, inGroup, isObjectID], ControllerGroup.leave);
 
     router
-        .route('/groups/:id')
-        .get([isAuth, isObjectID], ControllerGroup.getOne)
-        .put([isAuth, isObjectID], ControllerGroup.update)
-        .delete([isAuth, isObjectID], ControllerGroup.delete);
+        .route('/group/:id')
+        .get([isAuth, inGroup, isObjectID], ControllerGroup.getOne)
+        .put([isAuth, inGroup, isObjectID], ControllerGroup.update)
+        .delete([isAuth, inGroup, isObjectID], ControllerGroup.delete);
 
 };

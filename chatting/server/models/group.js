@@ -1,7 +1,7 @@
 'use strict';
 
-import mongoose from 'mongoose';
-import ClassGroup from './classes/group';
+import { mongoose } from './index';
+// import ClassGroup from './classes/group';
 const Schema = mongoose.Schema;
 
 const TYPE = {
@@ -24,8 +24,7 @@ const schema = new Schema(
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'User',
-                required: true,
-                unique: true
+                required: true
             }
         ],
         lastMessage: {
@@ -48,5 +47,6 @@ const schema = new Schema(
 schema.statics = {
     TYPE
 };
-schema.loadClass(ClassGroup);
-module.exports = mongoose.model('Group', schema);
+// schema.loadClass(ClassGroup);
+const Group = mongoose.model('Group', schema);
+module.exports = Group;

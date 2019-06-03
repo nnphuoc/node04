@@ -1,7 +1,7 @@
 'use strict';
 
-import mongoose from 'mongoose';
-import UserClass from './classes/user';
+import { mongoose } from './index';
+// import UserClass from './classes/user';
 const Schema = mongoose.Schema;
 
 const schema = new Schema(
@@ -43,5 +43,5 @@ const schema = new Schema(
     }
 );
 
-schema.loadClass(UserClass);
+// schema.loadClass(UserClass);
 module.exports = mongoose.model('User', schema);

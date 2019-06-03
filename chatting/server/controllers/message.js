@@ -1,7 +1,8 @@
 'use strict';
 
 import Message from '../models/message';
-import Group from '../models/group';
+// import Group from '../models/group';
+import { groupRepository, messageRepository } from '../repositories';
 import { Response } from '../helpers';
 
 export default class ControllerGroup {
@@ -11,7 +12,7 @@ export default class ControllerGroup {
             const data = req.body;
             data.author = req.user._id;
             data.type = Message.TYPE.AUTHOR;
-            const message = await Message.create(data);
+            const message = await messageRepository.create(data);
             return Response.success(res, message);
         } catch (e) {
             return next(e);
@@ -21,7 +22,7 @@ export default class ControllerGroup {
     static async createBySystem(req, res, next) {
         try {
             const data = req.body;
-            const message = await Message.create(data);
+            const message = await messageRepository.create(data);
             return Response.success(res, message);
         } catch (e) {
             return next(e);
@@ -30,13 +31,18 @@ export default class ControllerGroup {
 
     static async getAllByGroup(req, res, next) {
         try {
+            const { limit, page } = req.query;
             const group = req.params.id;
             const user = req.user._id;
-            const existedUser = await Group.getOne({ where: { members: user }});
+            const existedUser = await groupRepository.getOne({ where: { members: user }});
             if (!existedUser) {
                 return next(new Error('YOUR_NOT_IN_GROUP'));
             }
-            const messages = await Message.getAll({ where: { group }});
+            const messages = await messageRepository.getAll({
+                where: { group },
+                limit,
+                page
+            });
             return Response.success(res, messages);
         } catch (e) {
             return next(e);
@@ -46,7 +52,7 @@ export default class ControllerGroup {
     static async delete(req, res, next) {
         try {
             const  _id= req.body.id;
-            const message = await Message.softDelete({ where: { _id, author: req.user._id }});
+            const message = await messageRepository.softDelete({ where: { _id, author: req.user._id }});
             if (message.nModified === 0) {
                 return next(new Error('ACTION_FAIL'));
             }

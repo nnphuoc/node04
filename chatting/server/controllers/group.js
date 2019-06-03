@@ -1,15 +1,17 @@
 'use strict';
 
 import Group from '../models/group';
-import User from '../models/user';
+import { groupRepository, messageRepository, userRepository } from '../repositories';
 import { Response } from '../helpers';
 
 export default class ControllerGroup {
 
     static async getAll(req, res, next) {
         try {
-            const groups = await Group.getAll({
-                select: 'author lastMessage type',
+            const { limit, page } = req.query;
+            const groups = await groupRepository.getAll({
+                where: { members: req.user._id },
+                select: 'author lastMessage type members',
                 populate: {
                     path: 'lastMessage',
                     select: 'author content',
@@ -17,7 +19,9 @@ export default class ControllerGroup {
                         path: 'author',
                         select: 'name'
                     }
-                }
+                },
+                limit,
+                page
             });
             return Response.success(res, groups);
         } catch (e) {
@@ -30,20 +34,44 @@ export default class ControllerGroup {
             const data = req.body;
             data.author = req.user._id;
             data.members = Array.from(new Set(data.members));
-            data.type = Group.TYPE.DUO;
-            if (data.members.length > 1) {
-                data.type = Group.TYPE.GROUP;
+            if (!data.members.includes(data.author)) {
+                data.members.push(data.author);
             }
-            if (data.members && data.members.length > 0) {
-                const count = await User.countDocuments({ _id: { $in: data.members }});
-                if (count !== data.members.length) {
-                    return next(new Error('NOT_FOUND_USER_IN_LIST_MEMBER'));
+            data.type = data.members.length > 2 ? Group.TYPE.GROUP : Group.TYPE.DUO;
+            const promise = [
+                userRepository.getAll({
+                    where: {_id: { $in: data.members }},
+                    select: 'name'
+                })
+            ];
+            if (data.members.length === 2) {
+                promise.push(groupRepository.getOne({
+                    where: {
+                        members: {
+                            $all: data.members
+                        },
+                        type: 'duo'
+                    }
+                }));
+            }
+            const [listUsers, existGroup] = await Promise.all(promise);
+            if (listUsers.data.length !== data.members.length) {
+                return next(new Error('NOT_FOUND_USER_IN_LIST_MEMBER'));
+            }
+            if (existGroup) {
+                return Response.success(res, existGroup);
+            }
+            const group = await groupRepository.create(data);
+            let promiseUser = [];
+            for (let i = 0, len = listUsers.data.length; i < len; i++) {
+                if (listUsers.data[i]._id.toString() !== data.author.toString()) {
+                    promiseUser.push(messageRepository.create({
+                        group: group._id,
+                        content: listUsers.data[i].name + ' join in group'
+                    }));
                 }
-            } else {
-                data.members = [];
             }
-            data.members.push(data.author);
-            const group = await Group.create(data);
+            await Promise.all(promiseUser);
             return Response.success(res, group);
         } catch (e) {
             return next(e);
@@ -54,7 +82,7 @@ export default class ControllerGroup {
         try {
             const _id = req.params.id;
             const members = Array.from(new Set(req.body.members));
-            const group = await Group.findOneAndUpdate(
+            const group = await groupRepository.findOneAndUpdate(
                 { _id },
                 { $addToSet: { members: members }}
             );
@@ -71,7 +99,7 @@ export default class ControllerGroup {
         try {
             const _id = req.params.id;
             const user = req.user._id;
-            const group = await Group.updateOne(
+            const group = await groupRepository.updateOne(
                 { _id },
                 { $pull: { members: user }}
             );
@@ -87,12 +115,8 @@ export default class ControllerGroup {
     static async getOne(req, res, next) {
         try {
             const _id = req.params.id;
-            const group = await Group.getOne({
-                where: { _id },
-                populate: {
-                    path: 'members',
-                    select: 'name email slug geoPosition'
-                }
+            const group = await groupRepository.getOne({
+                where: { _id }
             });
             return Response.success(res, group);
         } catch (e) {
@@ -104,7 +128,7 @@ export default class ControllerGroup {
         try {
             const _id = req.params.id;
             const data = req.body;
-            const group = await Group.update(
+            const group = await groupRepository.update(
                 { _id },
                 { $set: data }
             );
@@ -120,7 +144,7 @@ export default class ControllerGroup {
     static async delete(req, res, next) {
         try {
             const _id = req.params.id;
-            const group = await Group.softDelete({
+            const group = await groupRepository.softDelete({
                 where: { _id, author: req.user._id }
             });
             if (group.nModified === 0) {

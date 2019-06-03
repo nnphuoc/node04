@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+<head>
+    <title>Socket.IO chat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font: 13px Helvetica, Arial; }
+        .form { padding: 3px; position: absolute; bottom: 0; width: 100%; }
+        .form input { border: 0; padding: 10px; width: 90%; border: 1px solid;}
+        .form button { width: 9%; background: rgb(170, 230, 250); border: none; padding: 10px; }
+        #messages { margin: 0; padding: 0; }
+        #messages .child { margin: 2px;  }
+        .child .col-8 { padding: 5px 10px; word-break: break-word; border-radius: 10px; font-size: 14pt;}
+        /* #messages li:nth-child(odd) { background: #eee; } */
+        .author { background-color: #3578e5; color: #fff ; }
+        .friend { background-color: #f1f0f0; color: rgba(0, 0, 0, 1)}
+    </style>
+    <script src="socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+</head>
+<body>
+ <div class="container-fluid">
+    <div class="row" style="height: 100vh">
+        <div class="col-3">
+            <h3>History</h3>
+            <ul>
+                <li>A</li>
+                <li>B</li>
+            </ul>
+        </div>
+        <div class="col-7" style="border-left: 1px solid; border-right: 1px solid">
+            <div id="messages"></div>
+            <div class="form row">
+                <input id="data" class="col-10" autocomplete="off" placeholder="Nhập tin nhắn ..."/>
+                <button id="btn" class="col-2">Send</button>
+            </div>
+        </div>
+        <div class="col-2">
+                <h3>List people</h3>
+                <ul>
+                    <li>A</li>
+                    <li>B</li>
+                </ul>
+        </div>
+    </div>
+    </body>
+ </div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script type="text/javascript">
+    const socket = io('http://localhost:5555');
+    let typing = false;
+    let timeout;
+    socket.on('send-message-from-server', function (data) {
+        $('.typing').remove();
+        $('#messages').append(`
+            <div class='col-12 child'>
+                    <div class='col-8 friend' style="text-align: left">
+                        ${data.message}
+                    </div>    
+            </div>
+        `);
+    });
+    socket.on('server-typing', function (data) {
+        $('.typing').remove();
+        $('#messages').append(`
+            <div class='col-12 child typing'>
+                <div class='col-8 friend' style="text-align: left">
+                    ${data.message}
+                </div>    
+            </div>
+        `);
+    });
+    socket.on('server-stop-typing', function (data) {
+        $('.typing').remove();
+    });
+    $('#btn').click(function () {
+        const message = $('#data').val().trim();
+        clearTimeout(timeout);
+        if (message) {
+            socket.emit('recieving-message', {
+                message: $('#data').val().trim()
+            }, (err, data) => {
+                if (err) {
+                    return alert('err');
+                }
+                $('#messages').append(`
+                    <div class='col-12 child'>
+                            <div class='offset-4 col-8 author' style="text-align: right">
+                                ${data.message}
+                            </div>    
+                    </div>
+                `);
+                $('#data').val('');
+            });
+        }
+    });
+    function timeOutSend() {
+        typing = false;
+        socket.emit('typing', {
+                message: '...'
+            }, (err, data) => {
+                if (err) {
+                    return alert('err');
+                }
+            });
+    }
+    $('#data').keyup(function(e){
+        if (e.keyCode !== 13) {
+            if (!typing) {
+                typing = true;
+                timeOutSend();
+            } else {
+                clearTimeout(timeout);
+                timeout = setTimeout(timeOutSend, 1000);
+            }
+        } else {
+            clearTimeout(timeout);
+            socket.emit('recieving-message', {
+                message: $('#data').val().trim()
+            }, (err, data) => {
+                if (err) {
+                    return alert('err');
+                }
+                $('#messages').append(`
+                    <div class='col-12 child'>
+                            <div class='offset-4 col-8 author' style="text-align: right">
+                                ${data.message}
+                            </div>    
+                    </div>
+                `);
+                $('#data').val('');
+            });
+        }
+    });
+    $('#data').focusout(function(){
+        clearTimeout(timeout);
+        socket.emit('stop-typing', {
+                message: 'stop'
+            }, (err, data) => {
+                if (err) {
+                    return alert('err');
+                }
+            });
+    })
+</script>
+
+</html>

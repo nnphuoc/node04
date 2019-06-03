@@ -1,8 +1,11 @@
-'use strict';
+import { mongoose } from '../models';
 
-export default class BaseModelClass {
+module.exports = class BaseRepository {
+    constructor(collectionName) {
+        this.model = mongoose.model(collectionName);
+    }
 
-    static async getAll (params) {
+    async getAll(params) {
         params = Object.assign(
             {
                 where: null,
@@ -20,14 +23,14 @@ export default class BaseModelClass {
             params.skip = params.limit * (params.page - 1);
         }
         const [data, count] = await Promise.all([
-            this.find({ ...params.where, deletedAt: null })
+            this.model.find({ ...params.where, deletedAt: null })
                 .select(params.select)
                 .sort(params.sort)
                 .skip(params.skip)
                 .limit(params.limit)
                 .populate(params.populate)
                 .lean(params.isLean),
-                this.countDocuments(params.where)
+            this.model.countDocuments(params.where)
         ]);
         return {
             page: params.page ? params.page : 1,
@@ -37,36 +40,36 @@ export default class BaseModelClass {
         };
     }
 
-    static async getOne (params) {
+    getOne(params) {
         params = Object.assign(
             {
                 where: null,
+                sort: { createdAt: -1 },
                 select: null,
                 populate: '',
-                isLean: true,
-                isUpdateCountView: false
+                isLean: true
             },
             params
         );
-        return await this.findOne({...params.where, deletedAt: null })
-            .populate(params.populate)
+        return this.model.findOne(params.where)
+            .sort(params.sort)
             .select(params.select)
+            .populate(params.populate)
             .lean(params.isLean);
     }
 
-    static async softDelete (option) {
-        return this.update(
-            option.where,
-            {
-                deletedAt: new Date()
-            }
-        );
+    create(data) {
+        if (data.length > 1) {
+            return this.model.insertMany(data);
+        }
+        return this.model.create(data);
     }
 
-    static async destroy (option) {
-        return this.remove(
-            option.where,
-        );
+    softDelete(params) {
+        return this.model.findOneAndUpdate(
+            params.where,
+            { deletedAt: new Date() }
+            );
     }
 
-}
+};

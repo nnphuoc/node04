@@ -6,7 +6,7 @@ const checkName = () => {
             name: Joi.string().max(20).required()
         }
     };
-}
+};
 
 const checkCreateUser = () => {
     return { 

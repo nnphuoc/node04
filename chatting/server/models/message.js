@@ -1,6 +1,6 @@
 'use strict';
 
-import mongoose from 'mongoose';
+import { mongoose } from './index';
 import MessageGroup from './classes/message';
 const Schema = mongoose.Schema;
 
@@ -16,6 +16,7 @@ const schema = new Schema(
         },
         content: {
             type: String,
+            minlength: 1,
             required: true
         },
         group: {
@@ -36,8 +37,8 @@ const schema = new Schema(
         timestamps: true
     }
 );
-schema.statics = {
-    TYPE
-};
-schema.loadClass(MessageGroup);
+// schema.statics = {
+//     TYPE
+// };
+// schema.loadClass(MessageGroup);
 module.exports = mongoose.model('Message', schema);

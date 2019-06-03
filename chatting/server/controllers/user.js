@@ -1,6 +1,9 @@
 'use strict';
 
-import userDB from '../models/user';
+import User from '../models/user';
+// import Group from '../models/group';
+// import Message from '../models/message';
+import { userRepository } from '../repositories'
 import verifyDB from '../models/verify';
 import bcrypt from 'bcrypt';
 import { Response, JWTHelper, Slug } from '../helpers';
@@ -10,7 +13,7 @@ export default class ControllerUser {
     static async create(req, res, next) {
         try {
             const body =req.body;
-            const user = await userDB.getOne({ where: { username: body.username }});
+            const user = await userRepository.getOne({ where: { username: body.username }});
             if (user) {
                 return res.json({
                     code: 'USER_IS_USED',
@@ -20,7 +23,7 @@ export default class ControllerUser {
             let salt = bcrypt.genSaltSync(2);
             let hashPass = bcrypt.hashSync(body.password, salt);
             body.password = hashPass;
-            const result = await userDB.create(body);
+            const result = await userRepository.create(body);
             result.slug = result._id;
             await result.save();
             delete result._doc.createdAt;
@@ -35,7 +38,7 @@ export default class ControllerUser {
 
     static async getAll(req, res, next) {
         try {
-            const results = await userDB.getAll();
+            const results = await userRepository.getAll();
             return Response.success(res, results);
         } catch (e) {
             return next(e);
@@ -45,7 +48,7 @@ export default class ControllerUser {
     static async getOne(req, res, next) {
         try {
             const _id = req.params.id;
-            const result = await userDB.getOne({ where: { _id }});
+            const result = await userRepository.getOne({ where: { _id }});
             return Response.success(res, result);
         } catch (e) {
             return next(e);
@@ -54,7 +57,7 @@ export default class ControllerUser {
 
     static async getByName(req, res, next) {
         try {
-            const result = await userDB.getOne({ where: { username: req.params.name }});
+            const result = await userRepository.getOne({ where: { username: req.params.name }});
             return Response.success(res, result);
         } catch (e) {
             return next(e);
@@ -63,7 +66,7 @@ export default class ControllerUser {
 
     static async login(req, res, next) {
         try {
-            const user = await userDB.getOne({ 
+            const user = await userRepository.getOne({ 
                 where: { 
                     username: req.body.username 
                 }
@@ -89,7 +92,7 @@ export default class ControllerUser {
     static async verify(req, res, next) {
         try {
             const { username, code } = req.body;
-            const user = await userDB.getOne({
+            const user = await userRepository.getOne({
                 where: { username }
             });
             if (!user) {
@@ -122,7 +125,7 @@ export default class ControllerUser {
     static async forgotPassword(req, res, next) {
         try {
             const username = req.body.username;
-            const user = await userDB.getOne(
+            const user = await userRepository.getOne(
                 { 
                     where: { username },
                     select: 'email'
@@ -157,7 +160,7 @@ export default class ControllerUser {
         try {
             const password = req.body.password;
             console.log(req.user);
-            const user = await userDB.getOne({
+            const user = await userRepository.getOne({
                 where: { _id: req.user._id },
                 select: 'password',
                 isLean: false
@@ -182,7 +185,7 @@ export default class ControllerUser {
             const data = req.body;
             data.name = data.name.trim().replace(/\s+/g, ' ');
             data.slug = Slug.parseSlug(data.name);
-            const user = await userDB.updateOne({ _id: id }, { $set: data });
+            const user = await userRepository.updateOne({ _id: id }, { $set: data });
             if (user.nModified === 0) {
                 return next(new Error('ACTION_FAIL'));
             }
@@ -195,7 +198,7 @@ export default class ControllerUser {
     static async delete(req, res, next) {
         try {
             const _id = req.params.id;
-            const user = await userDB.softDelete(
+            const user = await userRepository.softDelete(
                 { where: { _id }}
                 );
             if (user.nModified === 0) {
