@@ -9,7 +9,7 @@ export default class JWTHelper {
     options = Object.assign(
       {
         algorithm: 'RS256', 
-        expiresIn: 60*60*60
+        expiresIn: 60*60*60*30
       },
       options
     );

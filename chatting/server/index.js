@@ -7,10 +7,12 @@ import bodyParser from 'body-parser' ;
 import { port } from './config';
 import models from './models';
 import I18N from 'i18n';
+import cors from 'cors';
 import Response from './helpers/response';
 const app = Express();
 const server = Http.Server(app);
 const io = require('socket.io')(server);
+const socketHandler = require('./socket-handler/initialize-connection');
 
 I18N.configure({
     locales: ['en'],
@@ -21,7 +23,7 @@ I18N.configure({
 });
 
 models.connectDB()
-    .then( console.log('connection db successfuly'))
+    .then( console.log('connection db successful'))
     .catch(e=>{
         console.log(e);
         process.exit(1);
@@ -30,7 +32,13 @@ models.connectDB()
 app.use(I18N.init)
     .use(bodyParser.urlencoded({ extended: false }))
     .use(Express.static(__dirname + '/public'))
-    .use(bodyParser.json());
+    .use(bodyParser.json())
+    .use(cors({
+        "origin": "*",
+        "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+        "preflightContinue": false,
+        "optionsSuccessStatus": 204
+    }));
 
 const router = Express.Router();
 const routePath = `${__dirname}/routes/v1`;
@@ -49,9 +57,11 @@ FS.readdir(routePath, (e, fileNames) => {
     }
 });
 
-io.on('connection', function (socket) {
+socketHandler.initializeConnection(io);
+
+/*io.on('connection', function (socket) {
     console.log('user connect');
-    socket.on('recieving-message', (data, callback)=> {
+    socket.on('receiving-message', (data, callback)=> {
         try {
             socket.broadcast.emit('send-message-from-server', data);
             return callback(null, data);
@@ -76,7 +86,7 @@ io.on('connection', function (socket) {
     socket.on('disconnect', function () {
         console.log('user disconnect');
     })
-});
+});*/
 
 server.listen(port, () => {
     console.log(`App listening on ${port}!`);

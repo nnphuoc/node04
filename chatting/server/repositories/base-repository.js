@@ -1,8 +1,7 @@
-import { mongoose } from '../models';
 
 module.exports = class BaseRepository {
-    constructor(collectionName) {
-        this.model = mongoose.model(collectionName);
+    constructor(model) {
+        this.model = model;
     }
 
     async getAll(params) {

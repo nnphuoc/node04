@@ -8,8 +8,7 @@ const schema = new Schema(
     {
         username: {
             type: String,
-            maxlength: 255,
-            required: true
+            maxlength: 255
         },
         password: {
             type: String,
@@ -24,8 +23,8 @@ const schema = new Schema(
             maxlength: 255
         },
         facebook: {
-            type: String,
-            maxlength: 255
+            id: String,
+            token: String
         },
         slug: {
             type: String

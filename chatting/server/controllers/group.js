@@ -11,15 +11,20 @@ export default class ControllerGroup {
             const { limit, page } = req.query;
             const groups = await groupRepository.getAll({
                 where: { members: req.user._id },
-                select: 'author lastMessage type members',
-                populate: {
-                    path: 'lastMessage',
-                    select: 'author content',
-                    populate: {
-                        path: 'author',
-                        select: 'name'
+                select: 'author lastMessage type members name',
+                populate: [
+                    {
+                        path: 'lastMessage',
+                        select: 'author content',
+                        populate: {
+                            path: 'author',
+                            select: 'name'
+                        }
+                    },
+                    {
+                        path: 'members'
                     }
-                },
+                ],
                 limit,
                 page
             });
@@ -44,6 +49,7 @@ export default class ControllerGroup {
                     select: 'name'
                 })
             ];
+            let indexName;
             if (data.members.length === 2) {
                 promise.push(groupRepository.getOne({
                     where: {
@@ -53,10 +59,15 @@ export default class ControllerGroup {
                         type: 'duo'
                     }
                 }));
+                indexName = data.members.findIndex(menber=> menber!==data.author);
             }
             const [listUsers, existGroup] = await Promise.all(promise);
             if (listUsers.data.length !== data.members.length) {
                 return next(new Error('NOT_FOUND_USER_IN_LIST_MEMBER'));
+            }
+            if (data.members.length === 2) {
+                console.log(listUsers);
+                data.name = listUsers.data[indexName].name;
             }
             if (existGroup) {
                 return Response.success(res, existGroup);

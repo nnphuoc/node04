@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <title>Chat Socket.IO</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i&display=swap&subset=vietnamese" rel="stylesheet">
+        <title>Socket.IO chat</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+              integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="./css/main.css" />
+    </head>
+    <body>
+    <div class="container-fluid">
+        <div class="row wrapper">
+            <div class="group-list col-3">
+                <div class="header">
+                    <img src="./images/user.png" />
+                    <h3>Nguyễn Văn Khôi</h3>
+                </div>
+                <div class="search">
+                    <input type="text" id="search" placeholder="Tìm kiếm tin nhắn" />
+                </div>
+                <div id="list-group" class="list">
+
+                </div>
+            </div>
+            <div class="chat-box col-9">
+                <div class="header">
+                    <div class="info">
+                        <img src="./images/user.png" />
+                        <p>Ngọc Sơn</p>
+                    </div>
+                </div>
+                <div id="messages" class="list"></div>
+                <div class="box">
+                    <input id="input" type="text" placeholder="Nhập tin nhắn" >
+                </div>
+            </div>
+        </div>
+    </body>
+    <script src="socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="./js/index.js"></script>
+</html>

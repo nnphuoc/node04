@@ -1,18 +1,23 @@
 'use strict';
 
-import Message from '../models/message';
-// import Group from '../models/group';
+import Group from '../models/group';
 import { groupRepository, messageRepository } from '../repositories';
 import { Response } from '../helpers';
 
 export default class ControllerGroup {
 
-    static async create(req, res, next) {
+    static async create(req, res, next = (error)=> {
+        console.log(error)
+        return Promise.reject(error);
+    }) {
         try {
             const data = req.body;
-            data.author = req.user._id;
-            data.type = Message.TYPE.AUTHOR;
+            if (req.user) {
+                data.author = req.user._id;
+            }
+            data.type = 'author';
             const message = await messageRepository.create(data);
+            await Group.updateOne({ _id: data.group }, { lastMessage: message._id });
             return Response.success(res, message);
         } catch (e) {
             return next(e);

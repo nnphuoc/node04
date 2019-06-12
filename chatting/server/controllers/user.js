@@ -1,8 +1,5 @@
 'use strict';
 
-import User from '../models/user';
-// import Group from '../models/group';
-// import Message from '../models/message';
 import { userRepository } from '../repositories'
 import verifyDB from '../models/verify';
 import bcrypt from 'bcrypt';
@@ -209,4 +206,22 @@ export default class ControllerUser {
             return next(e);
         }
     }
+
+    static async createWithFB(req, res, next) {
+      try {
+          const body = req.body;
+          const userExist = await userRepository.findOne({
+              $and: [{
+                  token: body.facebook.token,
+                  id: body.facebook.id
+              }]
+          });
+          if (userExist) {
+              return Response.success(res);
+          }
+          const user = await userRepository.create(body);
+      } catch (e) {
+          return next(e);
+      }
+    };
 }
