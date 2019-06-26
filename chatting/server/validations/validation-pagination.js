@@ -3,7 +3,7 @@ import Joi from '@hapi/joi';
 const pagination = () => {
     return {
         query: {
-            limit: Joi.number().default(25),
+            limit: Joi.number().optional(),
             page: Joi.number().default(1)
         }
     };
@@ -11,4 +11,4 @@ const pagination = () => {
 
 module.exports = {
     pagination
-}
+};

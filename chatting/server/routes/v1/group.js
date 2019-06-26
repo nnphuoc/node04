@@ -3,6 +3,9 @@ import { ControllerGroup } from '../../controllers';
 import { MiddlewareUser, Auth } from '../../middlewares';
 import { pagination } from '../../validations/validation-pagination';
 import { celebrate, errors } from 'celebrate';
+import RedisCache from 'express-redis-cache';
+
+const cache = RedisCache({ host: '127.0.0.1', port: '6379'});
 
 const isObjectID = MiddlewareUser.checkObjectID;
 const validatePagination = celebrate(pagination());
@@ -13,7 +16,7 @@ module.exports = (app, router) => {
 
     router
         .route('/groups')
-        .get([isAuth, validatePagination, errors()], ControllerGroup.getAll)
+        .get([isAuth, validatePagination, errors(), cache.route({name: 'groups', expire: 3})], ControllerGroup.getAll)
         .post([isAuth], ControllerGroup.create);
 
     router

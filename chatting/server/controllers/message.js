@@ -39,6 +39,7 @@ export default class ControllerGroup {
             const { limit, page } = req.query;
             const group = req.params.id;
             const user = req.user._id;
+            console.log('here', limit);
             const existedUser = await groupRepository.getOne({ where: { members: user }});
             if (!existedUser) {
                 return next(new Error('YOUR_NOT_IN_GROUP'));
